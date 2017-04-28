@@ -25,6 +25,23 @@ public class ZCert {
 			public_txt = publicKey;
 		}
 	}
+
+	public ZCert(String publicKey, String secretKey) {
+		if (publicKey.length()==32) { // in binary-format
+			public_key = publicKey.getBytes();
+			public_txt = ZMQ.Curve.z85Encode(public_key);
+		} else { // Z85-Coded
+			public_key = ZMQ.Curve.z85Decode(publicKey);
+			public_txt = publicKey;
+		}
+		if (secretKey.length()==32) { // in binary-format
+			secret_key = secretKey.getBytes();
+			secret_txt = ZMQ.Curve.z85Encode(secret_key);
+		} else { // Z85-Coded
+			secret_key = ZMQ.Curve.z85Decode(secretKey);
+			secret_txt = secretKey;
+		}
+	}
 	
 	public ZCert() {
 		ZMQ.Curve.KeyPair keypair = ZMQ.Curve.generateKeyPair();
@@ -34,6 +51,20 @@ public class ZCert {
 		secret_txt = keypair.secretKey;
 	}
 	
+	public static ZCert load(String secretKeyFile) {
+		try {
+			ZConfig zconf = ZConfig.load(secretKeyFile);
+			String publicKey = zconf.getValue("curve/public-key");
+			String secretKey = zconf.getValue("curve/secret-key");
+			if( publicKey != null && secretKey != null ) {
+				return new ZCert(publicKey, secretKey);
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 	
 	
 	public byte[] getPublicKey() {
