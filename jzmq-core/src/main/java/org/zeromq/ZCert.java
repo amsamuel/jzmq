@@ -59,9 +59,7 @@ public class ZCert {
 			if( publicKey != null && secretKey != null ) {
 				return new ZCert(publicKey, secretKey);
 			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception e) {
 		}
 		return null;
 	}
